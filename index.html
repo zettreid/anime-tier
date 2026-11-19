@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Тир-лист аниме онлайн: составь свой рейтинг аниме бесплатно</title>
+<link rel="canonical" href="https://anitier.ru/">
+<meta property="og:url" content="https://anitier.ru/">
 <meta name="description" content="Бесплатный конструктор тир-листа аниме: расставляй тайтлы по уровням S–F, ставь оценки, веди список просмотренного, смотри статистику и сравнивай аниме. Без регистрации.">
 <meta property="og:type" content="website"><meta property="og:title" content="Тир-лист аниме онлайн — составь свой рейтинг"><meta property="og:description" content="Расставь аниме по тирам S–F, веди список просмотренного и статистику. Бесплатно и без регистрации.">
 <!-- Подтверждение сайта в Яндекс Вебмастере: вставьте сюда мета-тег, который выдаст Вебмастер -->
@@ -86,6 +88,19 @@ textarea{min-height:96px;resize:vertical}
 .ft{max-width:900px;margin:0 auto;padding:0 16px 24px;color:var(--tx2);font-size:13px}
 #ck{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto;background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.45;display:flex;gap:12px;align-items:center;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.18)}
 #ck[hidden]{display:none}
+[hidden]{display:none!important}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.acts{display:flex;gap:6px;align-items:center;position:relative}
+.mp{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:210px;display:flex;flex-direction:column;gap:6px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.mp label{font-size:12px;color:var(--tx2)}.mp .b{text-align:left}
+.fab{display:none}.emp{text-align:center;padding:28px 12px}.emp .b{margin:4px}
+details.m summary{cursor:pointer}.afr .b{display:flex;gap:8px;align-items:center;width:100%;text-align:left;margin-top:4px}.afr img{width:30px;height:42px;object-fit:cover;border-radius:4px;flex:none}
+@media(max-width:640px){
+#ad{display:none}.nv{margin-bottom:8px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--sf);border-top:1px solid var(--bd);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));flex-wrap:nowrap;gap:4px}
+.tabs .b{flex:1;padding:8px 2px;font-size:12px;border:0;background:transparent}.tabs .b.p{background:var(--ac);color:var(--bg)}
+.fab{display:flex;position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;background:var(--ac);color:var(--bg);border:0;font-size:28px;align-items:center;justify-content:center;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#app{padding-bottom:84px}#ck{bottom:calc(70px + env(safe-area-inset-bottom,0px))}}
+#cm,#pm{z-index:100}
 </style></head><body>
 <noscript><div><img src="https://mc.yandex.ru/watch/114335800" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <div id="app"><div id="v"><p class="m">Загрузка…</p></div><div id="d" hidden></div></div>
@@ -145,14 +160,16 @@ async function init(){
 }
 const opt=(a,sel)=>a.map(([k,l])=>`<option value="${k}"${sel==k?' selected':''}>${l}</option>`).join('');
 function shell(){
-  v.innerHTML=`<div class="top"><h1>Мой тир-лист аниме</h1><div><button class="b" id="un">↶ Отменить</button> <button class="b p" id="ad">Добавить тайтл</button></div></div>
-<div class="top"><div><button class="b" id="t1">Тайтлы</button> <button class="b" id="t2">Персонажи</button> <button class="b" id="t3">Статистика</button> <button class="b" id="t4">Сравнение</button></div><div><button class="b" id="sm">Выбрать</button> <button class="b" id="rn">Случайный</button> <button class="b" id="ex">Экспорт</button> <button class="b" id="im">Импорт</button> <button class="b" id="imt">Импорт текстом</button><input type="file" id="imf" accept=".json,application/json" hidden></div></div>
+  v.innerHTML=`<div class="top"><h1>Тир-лист аниме</h1><div><button class="b" id="un" hidden>↶ Отменить</button> <button class="b p" id="ad">+ Добавить тайтл</button></div></div>
+<div class="top nv"><div class="tabs"><button class="b" id="t1">Тайтлы</button> <button class="b" id="t2">Персонажи</button> <button class="b" id="t3">Статистика</button> <button class="b" id="t4">Сравнение</button></div>
+<div class="acts"><button class="b" id="rn" title="Случайный тайтл" aria-label="Случайный тайтл">🎲</button><button class="b" id="shi" title="Сохранить картинкой" aria-label="Сохранить тир-лист картинкой">📷</button><button class="b" id="mo" title="Ещё" aria-label="Ещё">⋯</button>
+<div class="mp" id="mp" hidden><button class="b" id="sm">Выбрать несколько</button><button class="b" id="ex">Экспорт в файл</button><button class="b" id="im">Импорт из файла</button><button class="b" id="imt">Импорт текстом</button><label>Размер карточек</label><select id="sz">${opt([['64','Компактно'],['78','Обычно'],['104','Крупно']],P.size)}</select><label>Тема</label><select id="th">${opt([['auto','Тема: авто'],['light','Светлая'],['dark','Тёмная'],['sakura','Сакура'],['ocean','Океан']],P.theme)}</select></div><input type="file" id="imf" accept=".json,application/json" hidden></div></div>
 <div id="sb" class="ctl" hidden></div>
-<div class="ctl"><input id="q" placeholder="Поиск…"><select id="fs">${opt([['','Все статусы'],...Object.entries(ST).map(([k,x])=>[k,x[0]])],P.fs)}</select>
-<select id="so">${opt([['ord','Вручную'],['rating','По оценке'],['title','По названию'],['year','По году']],P.sort)}</select>
-<select id="sz">${opt([['64','Компактно'],['78','Обычно'],['104','Крупно']],P.size)}</select>
-<select id="th">${opt([['auto','Тема: авто'],['light','Светлая'],['dark','Тёмная'],['sakura','Сакура'],['ocean','Океан']],P.theme)}</select><select id="fa" hidden></select></div><div id="tf" class="ctl" hidden></div>
-<div id="rw"></div><p class="m">Перетаскивай карточки: мышью или долгим нажатием на телефоне. Клавиши: N новый тайтл, / поиск, стрелки и Enter, 1–6 тир S–F, 0 без тира, R случайный, Ctrl+Z отмена, Esc назад. ${col?'Данные хранятся в твоём аккаунте.':'Данные хранятся только в этом браузере.'}</p>`;
+<div class="ctl"><input id="q" placeholder="Поиск…"><button class="b" id="fb">Фильтры</button><select id="fa" hidden></select></div>
+<div id="fp" class="ctl" hidden><select id="fs">${opt([['','Все статусы'],...Object.entries(ST).map(([k,x])=>[k,x[0]])],P.fs)}</select><select id="so">${opt([['ord','Вручную'],['rating','По оценке'],['title','По названию'],['year','По году']],P.sort)}</select></div><div id="tf" class="ctl" hidden></div>
+<div id="rw"></div><button class="fab" id="fab" aria-label="Добавить тайтл">+</button>
+<p class="m">${col?'Данные хранятся в твоём аккаунте.':'Данные хранятся только в этом браузере. Чтобы не потерять их, иногда делай экспорт (меню ⋯).'}</p>
+<details class="m"><summary>Подсказки по управлению</summary>Перетаскивай карточки мышью или долгим нажатием на телефоне. Клавиши: N новый тайтл, / поиск, стрелки и Enter, 1–6 тир S–F, 0 без тира, R случайный, Ctrl+Z отмена, Esc назад.</details>`;
 }
 function rows(get,nm=N){return [...T,''].map(t=>`<div class="row"><div class="lb" style="background:${t?CL[t]:'var(--sf2)'};${t?'':'color:var(--tx2)'}">${t||'—'}<small>${t?nm[t]:'без тира'}</small></div><div class="it" data-t="${t}">${get(t)}</div></div>`).join('')}
 function card(it,pp){const s=ST[it.status];return `<div class="cd${pp==it.id?' pop':''}${sel.has(it.id)?' sel':''}" data-id="${it.id}"><div class="cv" style="${bgi(it.cover)}">${it.cover?'':E((it.title||'?').trim()[0]||'?')}${s?`<i class="sd" style="background:${s[1]}" title="${s[0]}"></i>`:''}</div>${it.rating?`<b class="rt">${E(it.rating)}</b>`:''}<button class="mn" aria-label="Меню">⋯</button><span>${E(it.title)}</span></div>`}
@@ -162,15 +179,15 @@ const cmp={ord:(a,b)=>(a.ord||0)-(b.ord||0),rating:(a,b)=>(b.rating||0)-(a.ratin
 function chBlock(a){return rows(t=>a.chars.filter(c=>(c.tier||'')==t).sort(byN).map(c=>chCard(a,c,false)).join(''),NC)}
 function render(){render0();markFoc()}
 function render0(){
-  $('#t1').className='b'+(tab=='list'?' p':'');$('#t2').className='b'+(tab=='chars'?' p':'');$('#t3').className='b'+(tab=='stats'?' p':'');$('#t4').className='b'+(tab=='cmp'?' p':'');$('#sm').className='b'+(selMode?' p':'');$('#un').disabled=!H.length;
+  $('#t1').className='b'+(tab=='list'?' p':'');$('#t2').className='b'+(tab=='chars'?' p':'');$('#t3').className='b'+(tab=='stats'?' p':'');$('#t4').className='b'+(tab=='cmp'?' p':'');$('#sm').className='b'+(selMode?' p':'');$('#un').hidden=!H.length;
   {const ch=tab=='chars',fa=$('#fa'),tf=$('#tf');fa.hidden=tf.hidden=!ch;$('#fs').hidden=$('#so').hidden=tab!='list';
   if(ch){const tg=allTags();
   fa.innerHTML=opt([['','Все аниме'],...items.filter(a=>a.chars.length).map(a=>[a.id,a.title])],P.fa);P.fa=fa.value;P.ft=P.ft.filter(x=>tg.some(t=>t.toLowerCase()==x));tf.innerHTML=tg.map(t=>`<button class="tg${P.ft.includes(t.toLowerCase())?' on':''}" data-f="${E(t.toLowerCase())}" style="--tc:${tcol(t)}">${E(t)}</button>`).join('')+(tg.length>1?`<button class="b" data-fm="1" style="padding:2px 10px">${P.fm=='or'?'любой из выбранных':'все выбранные'}</button>`:'')+(P.ft.length?`<button class="b" data-fm="0" style="padding:2px 10px">Сбросить</button>`:'')}}
-  sbar();
+  sbar();fbl();
   const pp=pop,q=P.q.toLowerCase();pop=null;if(tab=='stats'){$('#rw').innerHTML=stats();return}if(tab=='cmp'){$('#rw').innerHTML=compare();return}
   if(tab=='list'){
     const vis=x=>(!q||x.title.toLowerCase().includes(q))&&(!P.fs||x.status==P.fs);
-    $('#rw').innerHTML=(items.length?'':'<p class="m">Пока пусто. Добавь первый тайтл или загрузи стартовый список.</p><p><button class="b" id="sd">Загрузить стартовый список</button></p>')
+    $('#rw').innerHTML=(items.length?'':'<div class="emp"><p><b>Здесь пока пусто</b></p><p class="m">Добавь первое аниме и расставь его по тирам: от S (шедевры) до F (пропустить).</p><button class="b p" id="ad2">Добавить первое аниме</button><button class="b" id="sd">Загрузить пример</button></div>')
       +rows(t=>items.filter(x=>(x.tier||'')===t&&vis(x)).sort(cmp[P.sort]).map(x=>card(x,pp)).join(''));
   }else{
     const all=items.flatMap(a=>a.chars.map(c=>({a,c}))).filter(x=>(!q||(x.c.n||'').toLowerCase().includes(q)||x.a.title.toLowerCase().includes(q))&&(!P.fa||x.a.id==P.fa)&&!x.c.gx&&(!P.ft.length||(m=>P.fm=='or'?P.ft.some(f=>m.includes(f)):P.ft.every(f=>m.includes(f)))(ctags(x.c).map(s=>s.toLowerCase()))));
@@ -230,9 +247,9 @@ v.onclick=e=>{
   if(Date.now()-jd<350)return;
   if(c&&selMode){const k=c.dataset.id+(c.dataset.ch?':'+c.dataset.ch:'');sel.has(k)?sel.delete(k):sel.add(k);c.classList.toggle('sel');sbar();return}
   if(c){fk=ck(c);c.dataset.ch?cmOpen(items.find(x=>x.id==c.dataset.id),c.dataset.ch):open(c.dataset.id);return}
-  if(t.id=='ad')add();else if(t.id=='sd')seed();else if(t.id=='un')undo();
+  if(t.id=='ad'||t.id=='ad2'||t.id=='fab')add();else if(t.id=='sd')seed();else if(t.id=='un')undo();
   else if(t.id=='t1'||t.id=='t2'||t.id=='t3'||t.id=='t4'){tab={t1:'list',t2:'chars',t3:'stats',t4:'cmp'}[t.id];sel.clear();render()}
-  else if(t.id=='sm'){selMode=!selMode;sel.clear();render()}else if(t.id=='rn')rnd();else if(t.id=='ex')exp();else if(t.id=='im')$('#imf').click();else if(t.id=='imt')impBox();
+  else if(t.id=='sm'){selMode=!selMode;sel.clear();render()}else if(t.id=='rn')rnd();else if(t.id=='shi')shot();else if(t.id=='ex')exp();else if(t.id=='im')$('#imf').click();else if(t.id=='imt')impBox();
   else if(t.closest('#sb')&&t.dataset.v!=null)bulk(t.dataset.v)
   else if(t.dataset.f!=null){const i=P.ft.indexOf(t.dataset.f);i<0?P.ft.push(t.dataset.f):P.ft.splice(i,1);applyP();render()}
   else if(t.dataset.fm!=null){if(t.dataset.fm=='1')P.fm=P.fm=='or'?'and':'or';else P.ft=[];applyP();render()}
@@ -249,7 +266,7 @@ function detail(){
   const it=cur;v.hidden=true;d.hidden=false;
   d.innerHTML=`<div class="top"><button class="b" id="bk">← К списку</button><button class="b d" id="rm">Удалить тайтл</button></div>
 <div class="dt"><div><div class="big" id="cv" style="${bgi(it.cover)}">${it.cover?'':'Нажми, перетащи файл или вставь Ctrl+V'}</div><input type="file" id="fc" accept="image/*" hidden></div>
-<div>${F('title','Название')}<div class="g"><div><label>Тир</label><select data-k="tier"><option value="">Без тира</option>${opt(T.map(t=>[t,t+' — '+N[t]]),it.tier)}</select></div>
+<div>${F('title','Название')}<button class="b" id="af" type="button" style="margin-top:6px">🔍 Найти и заполнить по названию</button><div class="afr" id="afr"></div><div class="g"><div><label>Тир</label><select data-k="tier"><option value="">Без тира</option>${opt(T.map(t=>[t,t+' — '+N[t]]),it.tier)}</select></div>
 <div><label>Статус</label><select data-k="status"><option value="">—</option>${opt(Object.entries(ST).map(([k,x])=>[k,x[0]]),it.status)}</select></div>${F('rating','Итоговая оценка','number','min=0 max=10 step=0.1')}</div>
 <div class="g">${F('year','Год')}${F('eps','Серий')}${F('genre','Жанры')}</div></div></div>
 <label>Оценка по критериям (0–10), итоговая считается как среднее</label><div class="g5">${CR.map(([k,l])=>`<div><small>${l}</small><input data-c="${k}" type="number" min="0" max="10" step="0.5" value="${E(it.crit[k])}"></div>`).join('')}</div>
@@ -501,6 +518,79 @@ async function impT(txt){
     +(links?' В файле есть картинки-ссылки ('+links+'): так экспортировала старая версия. Они покажутся только при импорте в тот же аккаунт.':''));
   for(const n of ok)await saveNow(n);
 }
+
+/* ---- UI: menu & filters ---- */
+function fbl(){const b=document.getElementById('fb');if(!b)return;b.hidden=tab!='list';const f=document.getElementById('fp');if(tab!='list')f.hidden=true;b.textContent='Фильтры'+((P.fs||P.sort!='ord')?' •':'')}
+document.addEventListener('click',e=>{
+  const m=document.getElementById('mp');if(!m)return;const t=e.target;
+  if(t.closest('#mo')){m.hidden=!m.hidden;return}
+  if(t.closest('#mp')&&(t.closest('select')||t.tagName=='LABEL'))return;
+  m.hidden=true;
+  if(t.closest('#fb')){const f=document.getElementById('fp');f.hidden=!f.hidden}
+});
+/* ---- save as image ---- */
+let shotB=null;
+async function shot(){
+  const its=items.filter(x=>x.tier);
+  if(!its.length){toast('Сначала расставь тайтлы по тирам');return}
+  toast('Собираю картинку…',0);
+  const W=1000,LW=110,CW=96,CH=134,G=8,HD=64,FT=44,per=Math.floor((W-LW-G)/(CW+G));
+  const tiers=T.map(t=>[t,its.filter(x=>x.tier==t).sort((a,b)=>(a.ord||0)-(b.ord||0))]).filter(x=>x[1].length);
+  const ld=async src=>{try{const u=await toData(src);if(!u)return null;return await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u})}catch(e){return null}};
+  const imgs=new Map(await Promise.all(its.map(async x=>[x.id,await ld(x.cover)])));
+  const rh=l=>Math.max(1,Math.ceil(l.length/per))*(CH+G)+G,H2=HD+tiers.reduce((s,x)=>s+rh(x[1])+G,0)+FT;
+  const c=document.createElement('canvas');c.width=W;c.height=H2;const g=c.getContext('2d');
+  const F='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  g.fillStyle='#1c1c22';g.fillRect(0,0,W,H2);g.fillStyle='#f2f2f5';g.textBaseline='middle';g.font='500 28px '+F;g.fillText('Мой тир-лист аниме',16,HD/2+2);
+  let y=HD;
+  for(const[t,l]of tiers){
+    const h=rh(l);g.fillStyle='#26262e';g.fillRect(0,y,W,h);g.fillStyle=CL[t];g.fillRect(0,y,LW,h);
+    g.fillStyle='#222';g.textAlign='center';g.font='600 40px '+F;g.fillText(t,LW/2,y+h/2-8);g.font='12px '+F;g.fillText(N[t],LW/2,y+h/2+20);g.textAlign='left';
+    l.forEach((it,i)=>{
+      const x=LW+G+(i%per)*(CW+G),yy=y+G+Math.floor(i/per)*(CH+G),im=imgs.get(it.id);
+      g.save();g.beginPath();g.roundRect?g.roundRect(x,yy,CW,CH,6):g.rect(x,yy,CW,CH);g.clip();
+      if(im){const k=Math.max(CW/im.width,CH/im.height),w=im.width*k,hh=im.height*k;g.drawImage(im,x+(CW-w)/2,yy+(CH-hh)/2,w,hh)}
+      else{g.fillStyle='#3a3a46';g.fillRect(x,yy,CW,CH);g.fillStyle='#aaa';g.textAlign='center';g.font='500 36px '+F;g.fillText((it.title||'?').trim()[0]||'?',x+CW/2,yy+CH/2-8);g.textAlign='left'}
+      const gr=g.createLinearGradient(0,yy+CH-38,0,yy+CH);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.85)');g.fillStyle=gr;g.fillRect(x,yy+CH-38,CW,38);
+      g.fillStyle='#fff';g.font='11px '+F;let tt=it.title||'';while(tt.length>1&&g.measureText(tt).width>CW-8)tt=tt.slice(0,-1);if(tt!=(it.title||''))tt=tt.slice(0,-1)+'…';g.fillText(tt,x+4,yy+CH-10);
+      g.restore();
+    });
+    y+=h+G;
+  }
+  g.fillStyle='#9a9aa5';g.font='14px '+F;g.fillText(location.hostname?location.hostname+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''):'Тир-лист аниме',16,H2-FT/2);
+  c.toBlob(b=>{
+    if(!b){toast('Не удалось собрать картинку');return}
+    shotB=b;const url=URL.createObjectURL(b);
+    cm.innerHTML=`<div class="mb"><p><b>Картинка готова</b></p><img src="${url}" alt="Мой тир-лист аниме" style="width:100%;border-radius:8px"><div class="top" style="margin:12px 0 0"><a class="b p" href="${url}" download="tier-list-anime.png" style="text-decoration:none">Скачать</a>${navigator.canShare?'<button class="b" id="shr">Поделиться</button>':''}<button class="b" id="cok">Закрыть</button></div><p class="m">На телефоне можно удержать картинку и выбрать «Сохранить».</p></div>`;
+    cm.hidden=false;ts.hidden=true;
+  },'image/png');
+}
+cm.addEventListener('click',e=>{if(e.target.id=='shr'&&shotB){const f=new File([shotB],'tier-list-anime.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>{});else toast('Здесь нельзя поделиться, используй «Скачать»')}});
+/* ---- autofill from anime database ---- */
+const SH='https://shikimori.one';let afRes=[];
+const strip=t=>String(t||'').replace(/\[\[|\]\]/g,'').replace(/\[[^\]]*\]/g,'').replace(/\s+/g,' ').trim();
+async function afSearch(){
+  const q=(cur.title||'').trim(),box=document.getElementById('afr');
+  if(!q||q=='Новый тайтл'){box.innerHTML='<p class="m">Сначала введи название выше.</p>';return}
+  box.innerHTML='<p class="m">Ищу…</p>';let res=[],net=0;
+  try{const r=await fetch(SH+'/api/animes?limit=6&order=popularity&search='+encodeURIComponent(q));if(!r.ok)throw 0;res=(await r.json()).map(a=>({src:'s',id:a.id,t:a.russian||a.name,o:a.name,y:(a.aired_on||'').slice(0,4),k:a.kind||'',img:a.image?SH+a.image.preview:''}))}catch(e){net++}
+  if(!res.length){try{const r=await fetch('https://api.jikan.moe/v4/anime?limit=6&q='+encodeURIComponent(q));if(!r.ok)throw 0;res=(await r.json()).data.map(a=>({src:'j',id:a.mal_id,t:a.title,o:a.title_japanese||'',y:a.year||'',k:a.type||'',img:a.images.jpg.small_image_url}))}catch(e){net++}}
+  afRes=res;
+  if(!res.length){box.innerHTML='<p class="m">'+(net>=2?'Не получилось связаться с базой аниме. Заполни поля вручную.':'Ничего не найдено. Попробуй другое название (по-русски или по-английски).')+'</p>';return}
+  box.innerHTML=res.map((a,i)=>`<button class="b" type="button" data-af="${i}">${a.img?`<img src="${E(a.img)}" alt="">`:''}<span>${E(a.t)}<br><small class="m">${E([a.o!=a.t?a.o:'',a.y,a.k].filter(Boolean).join(' · '))}</small></span></button>`).join('')+'<p class="m">Выбери нужный вариант, и пустые поля заполнятся.</p>';
+}
+async function afApply(a){
+  if(!a||!cur)return;toast('Заполняю…',0);let o;
+  try{
+    if(a.src=='s'){const x=await(await fetch(SH+'/api/animes/'+a.id)).json();o={title:x.russian||x.name,year:(x.aired_on||'').slice(0,4),eps:x.episodes||x.episodes_aired||'',genre:(x.genres||[]).map(g=>g.russian||g.name).join(', '),desc:strip(x.description),img:x.image?SH+x.image.original:''}}
+    else{const x=(await(await fetch('https://api.jikan.moe/v4/anime/'+a.id)).json()).data;o={title:x.title,year:x.year||'',eps:x.episodes||'',genre:(x.genres||[]).map(g=>g.name).join(', '),desc:strip(x.synopsis),img:x.images.jpg.large_image_url}}
+  }catch(e){toast('Не удалось получить данные. Заполни вручную.');return}
+  if(o.title)cur.title=o.title;
+  ['year','eps','genre','desc'].forEach(k=>{if(!cur[k]&&o[k])cur[k]=String(o[k])});
+  if(!cur.cover&&o.img){try{const r=await fetch(o.img);if(!r.ok)throw 0;cur.cover=await put(await r.blob(),400)}catch(e){cur.cover=o.img}}
+  save(cur);detail();toast('Готово, поля заполнены');
+}
+d.addEventListener('click',e=>{const t=e.target;if(t.id=='af')afSearch();else{const b=t.closest('[data-af]');if(b)afApply(afRes[+b.dataset.af])}});
 
 init();
 </script></body></html>
