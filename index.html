@@ -95,6 +95,8 @@ details.m summary{cursor:pointer}.afr .b{display:flex;gap:8px;align-items:center
 #cm,#pm{z-index:100}
 .seo{border-top:1px solid var(--bd);margin-top:28px;padding-top:12px;font-size:13px}.seo p{margin:0 0 8px}.seo summary{cursor:pointer;color:var(--tx2)}.seo details>*:not(summary){margin-top:8px}
 .ft a{color:inherit}#ck{flex-wrap:wrap}.ckb{display:flex;gap:8px;margin-left:auto}
+.note{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:12px;font-size:13px;color:var(--tx2)}.note .b{padding:2px 9px;flex:none}
+.acts{margin-left:auto}.mp{max-width:calc(100vw - 24px)}
 </style></head><body>
 <div id="app"><div id="v"><p class="m">Загрузка…</p></div><div id="d" hidden></div></div>
 <section class="seo">
@@ -167,14 +169,17 @@ async function init(){
   try{const db=await claude.use('db'),u=await claude.use('user');if(db&&u){const id=await u.id();if(id)col=db.collection('data/users/'+id)}}catch(e){}
   if(col){try{const s=await col.get();items=[];s.docs.forEach(r=>{const x=r.data();if(r.id=='meta'){TG=(x&&x.tags)||[];TC=(x&&x.colors)||{}}else if(x)items.push(x)})}catch(e){col=null}}
   if(!col){try{items=JSON.parse(localStorage.getItem('animetier')||'[]')}catch(e){items=[]}try{TG=JSON.parse(localStorage.getItem('animetags')||'[]')}catch(e){}try{TC=JSON.parse(localStorage.getItem('animecolors')||'{}')}catch(e){}}
-  items.forEach(norm);shell();render();
+  items.forEach(norm);
+  if(!items.length&&!localStorage.getItem('animeseed1'))await loadSeed(true);
+  shell();render();
 }
 const opt=(a,sel)=>a.map(([k,l])=>`<option value="${k}"${sel==k?' selected':''}>${l}</option>`).join('');
 function shell(){
   v.innerHTML=`<div class="top"><h1>AniTier <small style="font-size:13px;font-weight:400;color:var(--tx2)">тир-лист аниме</small></h1><div><button class="b" id="un" hidden>↶ Отменить</button> <button class="b p" id="ad">+ Добавить тайтл</button></div></div>
 <div class="top nv"><div class="tabs"><button class="b" id="t1">Тайтлы</button> <button class="b" id="t2">Персонажи</button> <button class="b" id="t3">Статистика</button> <button class="b" id="t4">Сравнение</button></div>
 <div class="acts"><button class="b" id="rn" title="Случайный тайтл" aria-label="Случайный тайтл">🎲</button><button class="b" id="shi" title="Сохранить картинкой" aria-label="Сохранить тир-лист картинкой">📷</button><button class="b" id="mo" title="Ещё" aria-label="Ещё">⋯</button>
-<div class="mp" id="mp" hidden><button class="b" id="sm">Выбрать несколько</button><button class="b" id="ex">Экспорт в файл</button><button class="b" id="im">Импорт из файла</button><button class="b" id="imt">Импорт текстом</button><label>Размер карточек</label><select id="sz">${opt([['64','Компактно'],['78','Обычно'],['104','Крупно']],P.size)}</select><label>Тема</label><select id="th">${opt([['auto','Тема: авто'],['light','Светлая'],['dark','Тёмная'],['sakura','Сакура'],['ocean','Океан']],P.theme)}</select></div><input type="file" id="imf" accept=".json,application/json" hidden></div></div>
+<div class="mp" id="mp" hidden><button class="b" id="sm">Выбрать несколько</button><button class="b" id="rst">Убрать стартовый шаблон</button><button class="b" id="ex">Экспорт в файл</button><button class="b" id="im">Импорт из файла</button><button class="b" id="imt">Импорт текстом</button><label>Размер карточек</label><select id="sz">${opt([['64','Компактно'],['78','Обычно'],['104','Крупно']],P.size)}</select><label>Тема</label><select id="th">${opt([['auto','Тема: авто'],['light','Светлая'],['dark','Тёмная'],['sakura','Сакура'],['ocean','Океан']],P.theme)}</select></div><input type="file" id="imf" accept=".json,application/json" hidden></div></div>
+<div class="note" id="dn" hidden><span>🚧 Сайт ещё в разработке: я постоянно улучшаю функции и добавляю новые аниме и персонажей. Если что-то выглядит странно, скоро поправлю!</span><button class="b" id="dnx" aria-label="Скрыть заметку" type="button">×</button></div>
 <div id="sb" class="ctl" hidden></div>
 <div class="ctl"><input id="q" placeholder="Поиск…"><button class="b" id="fb">Фильтры</button><select id="fa" hidden></select></div>
 <div id="fp" class="ctl" hidden><select id="fs">${opt([['','Все статусы'],...Object.entries(ST).map(([k,x])=>[k,x[0]])],P.fs)}</select><select id="so">${opt([['ord','Вручную'],['rating','По оценке'],['title','По названию'],['year','По году']],P.sort)}</select></div><div id="tf" class="ctl" hidden></div>
@@ -194,15 +199,15 @@ function render0(){
   {const ch=tab=='chars',fa=$('#fa'),tf=$('#tf');fa.hidden=tf.hidden=!ch;$('#fs').hidden=$('#so').hidden=tab!='list';
   if(ch){const tg=allTags();
   fa.innerHTML=opt([['','Все аниме'],...items.filter(a=>a.chars.length).map(a=>[a.id,a.title])],P.fa);P.fa=fa.value;P.ft=P.ft.filter(x=>tg.some(t=>t.toLowerCase()==x));tf.innerHTML=tg.map(t=>`<button class="tg${P.ft.includes(t.toLowerCase())?' on':''}" data-f="${E(t.toLowerCase())}" style="--tc:${tcol(t)}">${E(t)}</button>`).join('')+(tg.length>1?`<button class="b" data-fm="1" style="padding:2px 10px">${P.fm=='or'?'любой из выбранных':'все выбранные'}</button>`:'')+(P.ft.length?`<button class="b" data-fm="0" style="padding:2px 10px">Сбросить</button>`:'')}}
-  sbar();fbl();
+  sbar();fbl();{const r=document.getElementById('rst');if(r)r.hidden=!(items.some(x=>x.seed)||tplTags().length&&TG.some(t=>tplTags().map(y=>y.toLowerCase()).includes(t.toLowerCase())));const n=document.getElementById('dn');if(n&&!n.dataset.i){n.dataset.i=1;let h=0;try{h=localStorage.getItem('animenote')}catch(e){}n.hidden=!!h}}
   const pp=pop,q=P.q.toLowerCase();pop=null;if(tab=='stats'){$('#rw').innerHTML=stats();return}if(tab=='cmp'){$('#rw').innerHTML=compare();return}
   if(tab=='list'){
     const vis=x=>(!q||x.title.toLowerCase().includes(q))&&(!P.fs||x.status==P.fs);
-    $('#rw').innerHTML=(items.length?'':'<div class="emp"><p><b>Здесь пока пусто</b></p><p class="m">Добавь первое аниме и расставь его по тирам: от S (шедевры) до F (пропустить).</p><button class="b p" id="ad2">Добавить первое аниме</button><button class="b" id="sd">Загрузить пример</button></div>')
+    $('#rw').innerHTML=(items.length?'':'<div class="emp"><p><b>Здесь пока пусто</b></p><p class="m">Добавь первое аниме и расставь его по тирам: от S (шедевры) до F (пропустить).</p><button class="b p" id="ad2">Добавить первое аниме</button><button class="b" id="sd">Загрузить стартовый шаблон</button></div>')
       +rows(t=>items.filter(x=>(x.tier||'')===t&&vis(x)).sort(cmp[P.sort]).map(x=>card(x,pp)).join(''));
   }else{
     const all=items.flatMap(a=>a.chars.map(c=>({a,c}))).filter(x=>(!q||(x.c.n||'').toLowerCase().includes(q)||x.a.title.toLowerCase().includes(q))&&(!P.fa||x.a.id==P.fa)&&!x.c.gx&&(!P.ft.length||(m=>P.fm=='or'?P.ft.some(f=>m.includes(f)):P.ft.every(f=>m.includes(f)))(ctags(x.c).map(s=>s.toLowerCase()))));
-    $('#rw').innerHTML=(all.length?'':'<p class="m">'+(items.some(a=>a.chars.length)?'Все подходящие персонажи убраны или отфильтрованы.':'Персонажей пока нет. Добавь их на странице тайтла.')+'</p>')+rows(t=>all.filter(x=>(x.c.gt||'')==t).sort((p,q)=>byN(p.c,q.c)).map(x=>chCard(x.a,x.c,true)).join(''),NG)+rpanel();
+    $('#rw').innerHTML=(all.length?'':'<p class="m">'+(items.some(a=>a.chars.length)?'Все подходящие персонажи убраны или отфильтрованы.':'Персонажей пока нет. Добавь их на странице тайтла.')+'</p>')+rows(t=>{const l=all.filter(x=>(x.c.gt||'')==t).sort((p,q)=>byN(p.c,q.c)),n=MORE[t]||60;return l.slice(0,n).map(x=>chCard(x.a,x.c,true)).join('')+(l.length>n?`<button class="b" data-more="${t}">Показать ещё (${l.length-n})</button>`:'')},NG)+rpanel();
   }
 }
 function rr(){if(!d.hidden)$('#cr').innerHTML=chBlock(cur);else render()}
@@ -233,7 +238,38 @@ document.addEventListener('pointerup',e=>{
 document.addEventListener('pointercancel',dend);
 document.addEventListener('touchmove',e=>{if(pd&&pd.on)e.preventDefault()},{passive:false});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key=='z'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){e.preventDefault();undo()}});
-async function seed(){const arr=[];for(const t of T)SEED[t].split('|').forEach((s,i)=>arr.push(blank(s,t,i)));items=arr;render();for(const it of arr)await saveNow(it)}
+function tplTags(){try{return JSON.parse(localStorage.getItem('animeseedtags')||'[]')}catch(e){return[]}}
+async function loadSeed(auto){
+  let sd;try{const r=await fetch('seed.json?v=1');if(!r.ok)throw 0;sd=await r.json()}catch(e){if(!auto)toast('Не удалось загрузить шаблон. Проверь интернет и попробуй ещё раз.');return false}
+  if(!auto)snap();
+  const have=new Set(items.map(x=>x.id));let n=0;
+  for(const it of sd.items){if(have.has(it.id))continue;items.push(norm(it));n++}
+  (sd.tags||[]).forEach(t=>{if(!TG.some(x=>x.toLowerCase()==t.toLowerCase()))TG.push(t)});
+  TC=Object.assign({},sd.colors||{},TC);
+  try{localStorage.setItem('animeseed1','1');localStorage.setItem('animeseedtags',JSON.stringify(sd.tags||[]))}catch(e){}
+  saveTags();if(col){for(const it of items.filter(x=>x.seed))await saveNow(it)}else lsSave();
+  if(!auto){render();toast(n?'Шаблон добавлен: '+n+' тайтлов':'Шаблон уже на месте')}
+  return true;
+}
+function seed(){loadSeed(false)}
+function tplAsk(){
+  cm.innerHTML=`<div class="mb"><p><b>Что убрать из стартового шаблона?</b></p><p class="m">Твои собственные тайтлы и персонажи не удаляются. Действие можно отменить кнопкой «Отменить».</p><div style="display:flex;flex-direction:column;gap:6px"><button class="b" data-rt="tags">Только теги</button><button class="b" data-rt="chars">Только персонажей</button><button class="b d" data-rt="all">Вообще всё (тайтлы, персонажи и теги)</button><button class="b" id="cok">Отмена</button></div></div>`;cm.hidden=false;
+}
+function tplDo(k){
+  snap();const tt=tplTags().map(x=>x.toLowerCase());
+  if(k=='tags'||k=='all'){
+    TG=TG.filter(t=>!tt.includes(t.toLowerCase()));
+    items.forEach(a=>a.chars.forEach(c=>{const m=String(c.tags||'').split(',').map(x=>x.trim()).filter(Boolean),r=m.filter(x=>!tt.includes(x.toLowerCase()));if(r.length!=m.length){c.tags=r.join(', ');save(a)}}));
+    saveTags();
+  }
+  if(k=='chars'){items.forEach(a=>{if(a.chars.some(c=>c.sd)){a.chars=a.chars.filter(c=>!c.sd);save(a)}})}
+  if(k=='all'){const del=items.filter(x=>x.seed);items=items.filter(x=>!x.seed);del.forEach(x=>{if(col)col.doc('t_'+x.id).delete().catch(()=>{})});if(!col)lsSave()}
+  else if(!col)lsSave();
+  cm.hidden=true;render();toast('Готово');
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-rt]');if(b)tplDo(b.dataset.rt);if(e.target.id=='rst')tplAsk();if(e.target.id=='dnx'){document.getElementById('dn').hidden=true;try{localStorage.setItem('animenote','1')}catch(x){}}const m=e.target.closest&&e.target.closest('[data-more]');if(m){MORE[m.dataset.more]=(MORE[m.dataset.more]||60)+60;render()}});
+let MORE={};
+
 function add(){const it=blank('Новый тайтл','',Date.now());snap();items.push(it);save(it);open(it.id)}
 function open(id){cur=items.find(x=>x.id==id);if(!cur)return;armed=false;pz='';scrollTo(0,0);detail()}
 function back(){clearTimeout(tm[cur.id]);saveNow(cur);cur=null;d.hidden=true;v.hidden=false;render()}
@@ -277,7 +313,7 @@ function detail(){
   const it=cur;v.hidden=true;d.hidden=false;
   d.innerHTML=`<div class="top"><button class="b" id="bk">← К списку</button><button class="b d" id="rm">Удалить тайтл</button></div>
 <div class="dt"><div><div class="big" id="cv" style="${bgi(it.cover)}">${it.cover?'':'Нажми, перетащи файл или вставь Ctrl+V'}</div><input type="file" id="fc" accept="image/*" hidden></div>
-<div>${F('title','Название')}<button class="b" id="af" type="button" style="margin-top:6px">🔍 Найти и заполнить по названию</button><div class="afr" id="afr"></div><div class="g"><div><label>Тир</label><select data-k="tier"><option value="">Без тира</option>${opt(T.map(t=>[t,t+' — '+N[t]]),it.tier)}</select></div>
+<div>${F('title','Название')}<div class="g"><div><label>Тир</label><select data-k="tier"><option value="">Без тира</option>${opt(T.map(t=>[t,t+' — '+N[t]]),it.tier)}</select></div>
 <div><label>Статус</label><select data-k="status"><option value="">—</option>${opt(Object.entries(ST).map(([k,x])=>[k,x[0]]),it.status)}</select></div>${F('rating','Итоговая оценка','number','min=0 max=10 step=0.1')}</div>
 <div class="g">${F('year','Год')}${F('eps','Серий')}${F('genre','Жанры')}</div></div></div>
 <label>Оценка по критериям (0–10), итоговая считается как среднее</label><div class="g5">${CR.map(([k,l])=>`<div><small>${l}</small><input data-c="${k}" type="number" min="0" max="10" step="0.5" value="${E(it.crit[k])}"></div>`).join('')}</div>
@@ -488,13 +524,13 @@ async function exp(){
   cl.forEach(it=>{it.shots=it.shots.filter(Boolean)});ts.hidden=true;
   const data=JSON.stringify({v:5,items:cl,tags:TG,colors:TC}),mb=(data.length/1048576).toFixed(1),fn='anime-tierlist-'+new Date().toISOString().slice(0,10)+'.json',
     note='Картинок в файле: '+(refs.length-bad)+', размер около '+mb+' МБ.'+(bad?' Не удалось прочитать картинок: '+bad+', они пропущены.':'');
-  exd={data,fn,note};
-  cm.innerHTML=`<div class="mb"><p><b>Файл готов.</b></p><p class="m">${E(note)}</p><div class="top" style="margin:12px 0 0"><button class="b p" id="svx">Сохранить файл</button><button class="b" id="cok">Закрыть</button></div></div>`;cm.hidden=false;
+  exd={data,fn,note};exSave();
 }
 async function exSave(){
   const{data,fn,note}=exd;
   try{
-    const dl=await claude.use('downloads');if(!dl)throw {code:'unavailable'};
+    let dl=null;try{dl=await claude.use('downloads')}catch(e){}
+    if(!dl){const u=URL.createObjectURL(new Blob([data],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);cm.innerHTML=`<div class="mb"><p><b>Файл скачивается</b></p><p class="m">${E(fn)}. ${E(note)} Если скачивание не началось, нажми «Скачать ещё раз».</p><div class="top" style="margin:12px 0 0"><button class="b p" id="svx">Скачать ещё раз</button><button class="b" id="cok">Закрыть</button></div></div>`;cm.hidden=false;return}
     await dl.save({filename:fn,data:new Blob([data],{type:'application/json'})});cm.hidden=true;toast('Файл сохранён');
   }catch(e){
     if(e&&e.code=='declined')return;
@@ -545,7 +581,7 @@ async function shot(){
   const its=items.filter(x=>x.tier);
   if(!its.length){toast('Сначала расставь тайтлы по тирам');return}
   toast('Собираю картинку…',0);
-  const W=1000,LW=110,CW=96,CH=134,G=8,HD=64,FT=44,per=Math.floor((W-LW-G)/(CW+G));
+  const W=1000,LW=110,CW=96,CH=134,G=8,HD=64,FT=0,per=Math.floor((W-LW-G)/(CW+G));
   const tiers=T.map(t=>[t,its.filter(x=>x.tier==t).sort((a,b)=>(a.ord||0)-(b.ord||0))]).filter(x=>x[1].length);
   const ld=async src=>{try{const u=await toData(src);if(!u)return null;return await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u})}catch(e){return null}};
   const imgs=new Map(await Promise.all(its.map(async x=>[x.id,await ld(x.cover)])));
@@ -568,7 +604,7 @@ async function shot(){
     });
     y+=h+G;
   }
-  g.fillStyle='#9a9aa5';g.font='14px '+F;g.fillText(location.hostname?location.hostname+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''):'Тир-лист аниме',16,H2-FT/2);
+  g.save();g.textAlign='right';g.textBaseline='alphabetic';g.shadowColor='rgba(0,0,0,.45)';g.shadowBlur=4;g.fillStyle='rgba(255,255,255,.4)';g.font='600 26px '+F;g.fillText('anitier.ru',W-14,H2-14);g.restore();
   c.toBlob(b=>{
     if(!b){toast('Не удалось собрать картинку');return}
     shotB=b;const url=URL.createObjectURL(b);
@@ -577,31 +613,6 @@ async function shot(){
   },'image/png');
 }
 cm.addEventListener('click',e=>{if(e.target.id=='shr'&&shotB){const f=new File([shotB],'tier-list-anime.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f]}).catch(()=>{});else toast('Здесь нельзя поделиться, используй «Скачать»')}});
-/* ---- autofill from anime database ---- */
-const SH='https://shikimori.one';let afRes=[];
-const strip=t=>String(t||'').replace(/\[\[|\]\]/g,'').replace(/\[[^\]]*\]/g,'').replace(/\s+/g,' ').trim();
-async function afSearch(){
-  const q=(cur.title||'').trim(),box=document.getElementById('afr');
-  if(!q||q=='Новый тайтл'){box.innerHTML='<p class="m">Сначала введи название выше.</p>';return}
-  box.innerHTML='<p class="m">Ищу…</p>';let res=[],net=0;
-  try{const r=await fetch(SH+'/api/animes?limit=6&order=popularity&search='+encodeURIComponent(q));if(!r.ok)throw 0;res=(await r.json()).map(a=>({src:'s',id:a.id,t:a.russian||a.name,o:a.name,y:(a.aired_on||'').slice(0,4),k:a.kind||'',img:a.image?SH+a.image.preview:''}))}catch(e){net++}
-  if(!res.length){try{const r=await fetch('https://api.jikan.moe/v4/anime?limit=6&q='+encodeURIComponent(q));if(!r.ok)throw 0;res=(await r.json()).data.map(a=>({src:'j',id:a.mal_id,t:a.title,o:a.title_japanese||'',y:a.year||'',k:a.type||'',img:a.images.jpg.small_image_url}))}catch(e){net++}}
-  afRes=res;
-  if(!res.length){box.innerHTML='<p class="m">'+(net>=2?'Не получилось связаться с базой аниме. Заполни поля вручную.':'Ничего не найдено. Попробуй другое название (по-русски или по-английски).')+'</p>';return}
-  box.innerHTML=res.map((a,i)=>`<button class="b" type="button" data-af="${i}">${a.img?`<img src="${E(a.img)}" alt="">`:''}<span>${E(a.t)}<br><small class="m">${E([a.o!=a.t?a.o:'',a.y,a.k].filter(Boolean).join(' · '))}</small></span></button>`).join('')+'<p class="m">Выбери нужный вариант, и пустые поля заполнятся.</p>';
-}
-async function afApply(a){
-  if(!a||!cur)return;toast('Заполняю…',0);let o;
-  try{
-    if(a.src=='s'){const x=await(await fetch(SH+'/api/animes/'+a.id)).json();o={title:x.russian||x.name,year:(x.aired_on||'').slice(0,4),eps:x.episodes||x.episodes_aired||'',genre:(x.genres||[]).map(g=>g.russian||g.name).join(', '),desc:strip(x.description),img:x.image?SH+x.image.original:''}}
-    else{const x=(await(await fetch('https://api.jikan.moe/v4/anime/'+a.id)).json()).data;o={title:x.title,year:x.year||'',eps:x.episodes||'',genre:(x.genres||[]).map(g=>g.name).join(', '),desc:strip(x.synopsis),img:x.images.jpg.large_image_url}}
-  }catch(e){toast('Не удалось получить данные. Заполни вручную.');return}
-  if(o.title)cur.title=o.title;
-  ['year','eps','genre','desc'].forEach(k=>{if(!cur[k]&&o[k])cur[k]=String(o[k])});
-  if(!cur.cover&&o.img){try{const r=await fetch(o.img);if(!r.ok)throw 0;cur.cover=await put(await r.blob(),400)}catch(e){cur.cover=o.img}}
-  save(cur);detail();toast('Готово, поля заполнены');
-}
-d.addEventListener('click',e=>{const t=e.target;if(t.id=='af')afSearch();else{const b=t.closest('[data-af]');if(b)afApply(afRes[+b.dataset.af])}});
 
 init();
 </script></body></html>
