@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Тир-лист аниме онлайн: составь свой рейтинг аниме бесплатно</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>AniTier — тир-лист аниме онлайн</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="AniTier">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"AniTier","alternateName":["Аниметир","AniTier тир-лист аниме"],"url":"https://anitier.ru/"}</script>
 <link rel="canonical" href="https://anitier.ru/">
 <meta property="og:url" content="https://anitier.ru/">
 <meta name="description" content="Бесплатный конструктор тир-листа аниме: расставляй тайтлы по уровням S–F, ставь оценки, веди список просмотренного, смотри статистику и сравнивай аниме. Без регистрации.">
-<meta property="og:type" content="website"><meta property="og:title" content="Тир-лист аниме онлайн — составь свой рейтинг"><meta property="og:description" content="Расставь аниме по тирам S–F, веди список просмотренного и статистику. Бесплатно и без регистрации.">
+<meta property="og:type" content="website"><meta property="og:title" content="AniTier — тир-лист аниме онлайн"><meta property="og:description" content="Расставь аниме по тирам S–F, веди список просмотренного и статистику. Бесплатно и без регистрации.">
 <style>
 :root{--bg:#faf9f5;--sf:#fff;--sf2:#efede5;--tx:#1f1e1d;--tx2:#6b6a64;--bd:rgba(0,0,0,.15);--ac:#185fa5;--dg:#a32d2d;--w:78px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="sakura"]):not([data-theme="ocean"]){--bg:#1f1e1d;--sf:#2b2a28;--sf2:#383633;--tx:#f0eee6;--tx2:#a8a69c;--bd:rgba(255,255,255,.17);--ac:#85b7eb;--dg:#f09595}}
@@ -165,7 +171,7 @@ async function init(){
 }
 const opt=(a,sel)=>a.map(([k,l])=>`<option value="${k}"${sel==k?' selected':''}>${l}</option>`).join('');
 function shell(){
-  v.innerHTML=`<div class="top"><h1>Тир-лист аниме</h1><div><button class="b" id="un" hidden>↶ Отменить</button> <button class="b p" id="ad">+ Добавить тайтл</button></div></div>
+  v.innerHTML=`<div class="top"><h1>AniTier <small style="font-size:13px;font-weight:400;color:var(--tx2)">тир-лист аниме</small></h1><div><button class="b" id="un" hidden>↶ Отменить</button> <button class="b p" id="ad">+ Добавить тайтл</button></div></div>
 <div class="top nv"><div class="tabs"><button class="b" id="t1">Тайтлы</button> <button class="b" id="t2">Персонажи</button> <button class="b" id="t3">Статистика</button> <button class="b" id="t4">Сравнение</button></div>
 <div class="acts"><button class="b" id="rn" title="Случайный тайтл" aria-label="Случайный тайтл">🎲</button><button class="b" id="shi" title="Сохранить картинкой" aria-label="Сохранить тир-лист картинкой">📷</button><button class="b" id="mo" title="Ещё" aria-label="Ещё">⋯</button>
 <div class="mp" id="mp" hidden><button class="b" id="sm">Выбрать несколько</button><button class="b" id="ex">Экспорт в файл</button><button class="b" id="im">Импорт из файла</button><button class="b" id="imt">Импорт текстом</button><label>Размер карточек</label><select id="sz">${opt([['64','Компактно'],['78','Обычно'],['104','Крупно']],P.size)}</select><label>Тема</label><select id="th">${opt([['auto','Тема: авто'],['light','Светлая'],['dark','Тёмная'],['sakura','Сакура'],['ocean','Океан']],P.theme)}</select></div><input type="file" id="imf" accept=".json,application/json" hidden></div></div>
