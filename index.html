@@ -97,6 +97,9 @@ details.m summary{cursor:pointer}.afr .b{display:flex;gap:8px;align-items:center
 .ft a{color:inherit}#ck{flex-wrap:wrap}.ckb{display:flex;gap:8px;margin-left:auto}
 .note{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:12px;font-size:13px;color:var(--tx2)}.note .b{padding:2px 9px;flex:none}
 .acts{margin-left:auto}.mp{max-width:calc(100vw - 24px)}
+#dock{position:fixed;left:6px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:6px;padding:6px;background:rgba(20,20,26,.55);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.dk{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:19px;color:#222;transition:transform .12s;touch-action:none}
+.dk.ov{transform:scale(1.2);outline:3px solid #fff;outline-offset:1px}
 </style></head><body>
 <div id="app"><div id="v"><p class="m">Загрузка…</p></div><div id="d" hidden></div></div>
 <section class="seo">
@@ -219,12 +222,13 @@ function move(id,t,bf){
 }
 function drop(c,zn,tc){
   const t=zn.dataset.t,id=c.dataset.id,ch=c.dataset.ch;
-  if(ch){const a=items.find(x=>x.id==id),k=a&&a.chars.find(x=>x.id==ch);const f=v.contains(zn)?'gt':'tier';if(k&&k[f]!==t){k[f]=t;save(a)}rr();return}
+  if(ch){const a=items.find(x=>x.id==id),k=a&&a.chars.find(x=>x.id==ch);const f=(zn.dataset.dock?d.hidden:v.contains(zn))?'gt':'tier';if(k&&k[f]!==t){k[f]=t;save(a)}rr();return}
   snap();move(id,t,tc&&!tc.dataset.ch?tc.dataset.id:null);
 }
-function dstart(){const c=pd.c,r=c.getBoundingClientRect(),g=c.cloneNode(true);g.className='cd gh';g.style.width=r.width+'px';g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);c.classList.add('gs');Object.assign(pd,{g,ox:r.left-pd.x,oy:r.top-pd.y,on:true})}
-function dend(){if(!pd)return;clearTimeout(pd.t);if(pd.g)pd.g.remove();pd.c.classList.remove('gs');document.querySelectorAll('.ov').forEach(x=>x.classList.remove('ov'));pd=null}
-const zn=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.closest('.it')};
+function dstart(){const c=pd.c,r=c.getBoundingClientRect(),g=c.cloneNode(true);g.className='cd gh';g.style.width=r.width+'px';g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);c.classList.add('gs');Object.assign(pd,{g,ox:r.left-pd.x,oy:r.top-pd.y,on:true});if(pd.touch||innerWidth<=700)showDock()}
+function showDock(){let k=document.getElementById('dock');if(!k){k=document.createElement('div');k.id='dock';k.innerHTML=[...T,''].map(t=>`<div class="dk" data-dock="1" data-t="${t}" style="background:${t?CL[t]:'var(--sf2)'};${t?'':'color:var(--tx2)'}">${t||'—'}</div>`).join('');document.body.appendChild(k)}k.hidden=false}
+function dend(){if(!pd)return;const dk=document.getElementById('dock');if(dk)dk.hidden=true;clearTimeout(pd.t);if(pd.g)pd.g.remove();pd.c.classList.remove('gs');document.querySelectorAll('.ov').forEach(x=>x.classList.remove('ov'));pd=null}
+const zn=e=>{const el=document.elementFromPoint(e.clientX,e.clientY);return el&&el.closest('.it,.dk')};
 document.addEventListener('pointerdown',e=>{const c=e.target.closest('.cd');if(selMode||!c||c.classList.contains('gh')||e.target.closest('.mn')||e.button>0)return;pd={c,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!='mouse'};if(pd.touch)pd.t=setTimeout(dstart,300)});
 document.addEventListener('pointermove',e=>{
   if(!pd)return;
