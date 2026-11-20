@@ -78,8 +78,6 @@ textarea{min-height:96px;resize:vertical}
 .seo{max-width:900px;margin:8px auto 0;padding:0 16px 32px;color:var(--tx2);font-size:14px;line-height:1.6}
 .seo h2{font-size:17px;font-weight:500;color:var(--tx);margin:20px 0 6px}.seo h3{font-size:15px;font-weight:500;color:var(--tx);margin:14px 0 4px}.seo p,.seo ul{margin:0 0 8px}.seo ul{padding-left:20px}
 .ft{max-width:900px;margin:0 auto;padding:0 16px 24px;color:var(--tx2);font-size:13px}
-#ck{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto;background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.45;display:flex;gap:12px;align-items:center;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.18)}
-#ck[hidden]{display:none}
 [hidden]{display:none!important}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}.acts{display:flex;gap:6px;align-items:center;position:relative}
 .mp{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:210px;display:flex;flex-direction:column;gap:6px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
@@ -91,10 +89,10 @@ details.m summary{cursor:pointer}.afr .b{display:flex;gap:8px;align-items:center
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--sf);border-top:1px solid var(--bd);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));flex-wrap:nowrap;gap:4px}
 .tabs .b{flex:1;padding:8px 2px;font-size:12px;border:0;background:transparent}.tabs .b.p{background:var(--ac);color:var(--bg)}
 .fab{display:flex;position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));width:52px;height:52px;border-radius:50%;background:var(--ac);color:var(--bg);border:0;font-size:28px;align-items:center;justify-content:center;z-index:40;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-#app{padding-bottom:84px}#ck{bottom:calc(70px + env(safe-area-inset-bottom,0px))}}
+#app{padding-bottom:84px}}
 #cm,#pm{z-index:100}
 .seo{border-top:1px solid var(--bd);margin-top:28px;padding-top:12px;font-size:13px}.seo p{margin:0 0 8px}.seo summary{cursor:pointer;color:var(--tx2)}.seo details>*:not(summary){margin-top:8px}
-.ft a{color:inherit}#ck{flex-wrap:wrap}.ckb{display:flex;gap:8px;margin-left:auto}
+.ft a{color:inherit}.ckb{display:flex;gap:8px;margin-left:auto}
 .note{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:12px;font-size:13px;color:var(--tx2)}.note .b{padding:2px 9px;flex:none}
 .acts{margin-left:auto}.mp{max-width:calc(100vw - 24px)}
 #dock{position:fixed;left:6px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:6px;padding:6px;background:rgba(20,20,26,.55);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
@@ -115,29 +113,7 @@ details.m summary{cursor:pointer}.afr .b{display:flex;gap:8px;align-items:center
 <p><b>Как составить хороший тир-лист?</b> Начните с любимых тайтлов в S, затем распределите остальные относительно них. Сравнивайте близкие по уровню тайтлы между собой, так рейтинг получается честнее.</p>
 </details>
 </section>
-<footer class="ft">© 2026 zettreid. Все права защищены. Копирование кода и текстов без разрешения автора запрещено.<br><a href="privacy.html">Политика конфиденциальности</a> · <a href="#" id="cks">Настройки cookie</a></footer>
-<div id="ck" hidden role="dialog" aria-label="Использование cookie"><span>Мы используем cookie и сервис Яндекс Метрика для статистики посещений, но только с вашего согласия. Подробнее в <a href="privacy.html">политике конфиденциальности</a>.</span><div class="ckb"><button class="b" id="ckn" type="button">Отклонить</button><button class="b p" id="cka" type="button">Принять</button></div></div>
-<script>
-(function(){
-  var K='ckc',Y=365*864e5,c=document.getElementById('ck'),on=false;
-  function metrika(){
-    if(on)return;on=true;
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=114371706', 'ym');
-    ym(114371706, 'init', {ssr:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-  }
-  function get(){try{var o=JSON.parse(localStorage.getItem(K));if(o&&Date.now()-o.t<Y)return o.v}catch(e){}return null}
-  function set(v){try{localStorage.setItem(K,JSON.stringify({v:v,t:Date.now()}))}catch(e){}}
-  var st=get();if(st==='1')metrika();else if(st===null)c.hidden=false;
-  document.getElementById('cka').onclick=function(){set('1');c.hidden=true;metrika()};
-  document.getElementById('ckn').onclick=function(){set('0');c.hidden=true};
-  document.getElementById('cks').onclick=function(){c.hidden=false;return false};
-})();
-</script>
+<footer class="ft">© 2026 zettreid. Все права защищены. Копирование кода и текстов без разрешения автора запрещено.</footer>
 <div id="z" hidden><img alt=""></div><div id="cm" hidden></div><div id="pm" hidden></div>
 <script>
 const T=['S','A','B','C','D','F'],N={S:'шедевры',A:'отличные',B:'хорошие',C:'на любителя',D:'слабые',F:'пропустить'},CL={S:'#f28b82',A:'#f6b26b',B:'#f5d76e',C:'#a8d88e',D:'#8fc1ee',F:'#c4c0d8'};
